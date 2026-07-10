@@ -63,23 +63,34 @@ public:
 
 template <>
 struct std::formatter<Polygon> : ShapeBaseFormatter {
+    bool long_vertices = false;
+
+    template<class ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        auto it = ShapeBaseFormatter::parse(ctx);
+        if (it != ctx.end() && *it == ':') {
+            ++it;
+            long_vertices = (it != ctx.end()) && *it == 'l';
+            it += long_vertices;
+        }
+        return it;
+    }
+
     template<class FmtContext>
     auto format(const Polygon& polygon, FmtContext& ctx) const {
         if (long_format) {
-            return std::format_to(ctx.out(),
-                "Polygon(name={}, order={}, vertices={::l})", // todo: l et ll
-                polygon.name(),
-                polygon.order(),
-                polygon.m_vertices
-            );
+            auto out = std::format_to(ctx.out(),
+                "Polygon(name={}, order={}, vertices=",
+                polygon.name(), polygon.order());
+            if (long_vertices) {
+                out = std::format_to(out, "{::l}", polygon.m_vertices);
+            } else {
+                out = std::format_to(out, "{}", polygon.m_vertices);
+            }
+            return std::format_to(out, ")");
         }
-        else {
-            return std::format_to(ctx.out(),
-                "{}<o:{}>",
-                polygon.name(),
-                polygon.order()
-            );
-        }
+        return std::format_to(ctx.out(), "{}<o:{}>",
+            polygon.name(), polygon.order());
     }
 };
 

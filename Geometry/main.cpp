@@ -142,6 +142,7 @@ void playWithShapes() {
 } // destruction de tous les shapes
 
 void playWithPolygons() {
+	std::println("*************** P O L Y G O N S **************");
 	Polygon poly0;
 	Polygon poly1(
 		"ABC", 
@@ -181,8 +182,10 @@ void playWithPolygons() {
 
 	auto it = std::begin(poly3);
 
-	std::println("{0} / {0:l}", poly2);
-	std::println("perimeter = {}, area = {}", poly2.perimeter(), poly2.area());
+	std::println("Polygon (short format): {0}", poly2);
+	std::println("Polygon (long format: vertices in short format): {0:l}", poly2);
+	std::println("Polygon (long format / vertices in long format): {0:l:l}", poly2);
+	std::println(" - perimeter = {}, area = {}", poly2.perimeter(), poly2.area());
 
 	// concave polygon from Wikipedia shoelace formula article — expected area: 16.5
 	Polygon polyWiki(
@@ -195,8 +198,17 @@ void playWithPolygons() {
 			Point("E", 8, 5)
 		}
 	);
-	std::println("{:l}", polyWiki);
-	std::println("area = {} (expected 16.5)", polyWiki.area());
+	std::println("Polygon (short format): {0}", polyWiki);
+	std::println("Polygon (long format: vertices in short format): {0:l}", polyWiki);
+	std::println("Polygon (long format / vertices in long format): {0:l:l}", polyWiki);
+	std::println(" - area = {} (expected 16.5)", polyWiki.area());
+
+	std::vector<Polygon> polygons{ poly2, polyWiki }; // copies
+	std::println();
+	std::println("{}", polygons);
+	std::println("{::l}", polygons);
+	std::println("{:n:l}", polygons);
+	std::println("{::l:l}", polygons);
 }
 
 
