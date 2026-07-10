@@ -54,6 +54,19 @@ std::string Movie::toString() const
 	return std::format("{}", *this); // utilise la surcharge de template formatter pour le type Movie
 }
 
+bool Movie::operator==(const Movie& other) const
+{
+	return (this->m_title == other.m_title)
+		&& (this->m_year == other.m_year)
+		&& (this->m_duration == other.m_duration);
+}
+
+std::weak_ordering Movie::operator<=>(const Movie& other) const
+{
+	if (auto cmp = this->m_year <=> other.m_year; cmp != std::partial_ordering::equivalent) return cmp;
+	return this->m_title <=> other.m_title;
+}
+
 std::ostream& operator<<(std::ostream& out, const Movie& movie)
 {
 	 //return out << movie.toString();

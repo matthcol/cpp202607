@@ -4,6 +4,7 @@
 #include <format>
 #include <iostream>
 //#include <vector>
+#include <compare>
 
 class Movie {
 private:
@@ -32,6 +33,12 @@ public:
 	void setDuration(std::uint16_t duration);
 
 	std::string toString() const;
+
+	// std::strong_ordering operator<=>(const Movie& other) const = default; 
+	// => generate 6 operateurs legacy: == != < <= > >=
+
+	bool operator==(const Movie& other) const;  // generate: == et !=
+	std::weak_ordering operator<=>(const Movie& other) const; // generate: < <= > >=
 };
 
 std::ostream& operator<<(std::ostream& out, const Movie& movie);
@@ -43,13 +50,15 @@ template <>
 struct std::formatter<Movie> {
 	bool long_format = false;
 
-	constexpr auto parse(std::format_parse_context& ctx) {
+	template<class ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
 		auto it = ctx.begin();
 		long_format = (it != ctx.end()) && *it == 'l';
 		return it + long_format; // + 0/1
 	}
 
-	auto format(const Movie& movie, std::format_context& ctx) const {
+	template<class FmtContext>
+	auto format(const Movie& movie, FmtContext& ctx) const {
 		if (long_format) {
 			return std::format_to(ctx.out(), "Movie(title={}, year={}, duration={})", movie.title(), movie.year(), movie.duration());
 		}
@@ -59,9 +68,6 @@ struct std::formatter<Movie> {
 	}
 };
 
-// on pourrait aussi faire :
-//template <>
-//struct std::formatter<std::vector<Movie>> {
-//
-//};
-
+static_assert(std::formattable<Movie, char>);
+static_assert(std::formattable<Movie&, char>);
+static_assert(std::formattable<const Movie&, char>);

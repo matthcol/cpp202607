@@ -6,6 +6,7 @@
 
 
 template<std::forward_iterator I, std::sentinel_for<I> S>
+	requires std::formattable<std::iter_value_t<I>, char>
 void print_range(
 	I first,
 	S last,
@@ -34,6 +35,7 @@ void print_range(
 }
 
 template<std::ranges::input_range R> 
+	requires std::formattable<std::ranges::range_value_t<R>, char>
 void print_range(
 	R&& r,
 	std::string_view intro = "",

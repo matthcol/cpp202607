@@ -1,0 +1,8 @@
+.vs/
+.vscode/
+*.slnx
+*.vcxproj*
+x64/
+__draft__
+.venv/
+.claude/

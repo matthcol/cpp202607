@@ -2,6 +2,7 @@
 
 #include <string>
 #include <utility>
+#include <compare>
 
 class Shape // abstract class car 1 methode virtuelle pure
 {
@@ -15,5 +16,10 @@ public:
 	virtual void translate(double deltaX, double deltaY) =0; // methode virtuelle pure => "abtract"
 	virtual void translate(const std::pair<double, double>& delta) = 0;
 	virtual void translate(std::pair<double, double>&& delta) = 0;
+
+	auto operator<=>(const Shape& other) const = default;
 };
 
+
+
+// TODO !!!!!!!!!!!!!!!!!!!!!!!! destructor !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

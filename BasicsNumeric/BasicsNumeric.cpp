@@ -173,6 +173,9 @@ void playWithComparisons() {
         << "comparaison (double) not defined (3): " << (cmp3 == std::partial_ordering::unordered) << std::endl
         ;
 
+    // weak ordering : <=> des string insensible à la casse
+    //  Toulouse equivalent à toulouse MAIS Toulouse n'est pas égal à toulouse
+
 }
 
 int main()
@@ -182,6 +185,7 @@ int main()
     playWithIntegers_operators();
     playWithFloats_operators();
     playWithComparisons();
+    // std::cerr << "Error unexpected" << std::endl;
     return EXIT_SUCCESS; 
     // or 
     // return EXIT_FAILURE;

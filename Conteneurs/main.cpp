@@ -4,8 +4,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 #include <print>
 #include <format>
+#include <functional>
+#include <tuple>
 
 //static_assert(std::formattable<Movie, char>, "1: formatter Movie invisible");
 //static_assert(std::formattable<const Movie&, char>, "2: Movie pas formatable en const");
@@ -37,6 +40,8 @@ void useVectorItForward(std::vector<double>::iterator first, std::vector<double>
 }
 
 void playWithArrays(size_t size) {
+	std::println();
+	std::println("*************** Temperatures [Array] *******************");
 	// static arrays
 	double temperatures1[]{ 12.5, 39.3, 45.7 };
 	double temperatures2[] = { 25.2, 34.1, -10.5 };
@@ -79,6 +84,8 @@ void playWithArrays(size_t size) {
 }
 
 void playWithVectorDouble() {
+	std::println();
+	std::println("*************** Temperatures [vector] *******************");
 	std::vector<double> temperatures1{ 12.5, 39.3, 45.7, 13.4, 15.7, 18.5 };
 	std::cout << "Vector 1: size " << temperatures1.size() << std::endl;
 	for (auto t : temperatures1) {
@@ -136,6 +143,8 @@ void playWithVectorDouble() {
 }
 
 void playWithVectorString() {
+	std::println();
+	std::println("*************** Cities *******************");
 	std::vector<std::string> cities{ "Toulouse", "Narbonne", "Pau", "Nassau" };
 	displayIterableLegacy(cities.begin(), cities.end());
 	std::vector<std::u8string> words{ u8"東京", u8"🦜" };
@@ -182,8 +191,11 @@ void playWithMovies() {
 	std::string title("Fast and Furious");
 	movieClone = title; // conversion implicite avec constructeur Movie(const std::string& title)
 
-	// TODO: display movie
-	// TODO: vector<Movie>
+	movie1.setYear(2026);
+	movie2.setDuration(238);
+	movie2.setYear(1939);
+	movie3.setDuration(128);
+	movie4.setDuration(107);
 
 	std::cout << movie1.toString() << std::endl;
 	std::println("{}", movie1.toString());
@@ -222,10 +234,110 @@ void playWithMovies() {
 	displayRange(movies2);
 	displayRange(movies3);
 	displayRange(movies4);
-	//std::println("{0:n:l}", movies);
+	std::println("{0:n:l}", movies);
+
+	// Pour les 3 vecteurs: movies, movies3, movies4
+	// faire une boucle range-for (for myvar: iterable)
+	// - print title
+	// - calcule la duree totale
+	std::println("Movies [direct]:");
+	std::uint16_t total_duration = 0;
+	for (const auto& movie : movies) {
+		std::println(" - {}", movie.title());
+		total_duration += movie.duration();
+	}
+	std::println("Total duration: {}", total_duration);
+
+	std::println("Movies [ref]:");
+	total_duration = 0;
+	for (const Movie& movie : movies3) {  // auto ne dereference pas automatiquemnt le wrapper
+		std::println(" - {}", movie.title());
+		total_duration += movie.duration();
+	}
+	std::println("Total duration: {}", total_duration);
+
+	std::println("Movies [direct]:");
+	total_duration = 0;
+	for (auto movie_ptr : movies4) {  // ou:  const Movie*
+		std::println(" - {}", movie_ptr->title());
+		total_duration += movie_ptr->duration();
+	}
+	std::println("Total duration: {}", total_duration);
+
+	std::println("Movies [algorithm + numeric]:");
+	std::vector<std::uint16_t> durations(movies.size());
+	std::transform(
+		movies.cbegin(), movies.cend(), 
+		durations.begin(), 
+		[](auto& movie) {return movie.duration(); }
+	);
+	total_duration = std::accumulate(
+		durations.begin(), durations.end(), 
+		0,
+		std::plus<std::uint16_t>()  // [](std::uint16_t d1, std::uint16_t d2){ return d1 + d2;}
+	);
+	std::println("Total duration: {}", total_duration);
+
+	std::println("Movies [ranges]:");
+	std::vector<std::uint16_t> durations2(movies.size());
+	std::ranges::transform(
+		movies,
+		durations2.begin(),
+		[](auto& movie) {return movie.duration(); }
+	);
+	total_duration = std::ranges::fold_left(
+		durations2,
+		0,
+		std::plus<std::uint16_t>() 
+	);
+	std::println("Total duration: {}", total_duration);
+
+	std::println("Movies [ranges 2]:");
+	total_duration = std::ranges::fold_left(
+		movies,
+		0,
+		[](std::uint16_t acc, const auto& movie) {return acc + movie.duration(); }
+	);
+	std::println("Total duration: {}", total_duration);
+
+	std::println("Movies [views]:");
+	std::uint16_t year_threshold = 1950;
+	auto lazy_pipeline = movies
+		| std::views::filter([year_threshold](const auto& movie) {return movie.year() >= year_threshold; })
+		| std::views::transform([](const auto& movie) { return movie.duration(); })
+		// | std::ranges::to<std::vector<std::uint16_t>>(); // C++23
+		;
+	total_duration = std::ranges::fold_left(
+		lazy_pipeline,
+		0,
+		std::plus{} // non typé
+	);
+
+	std::ranges::sort(movies, {}, &Movie::year);
+	displayRange(movies);
+	std::ranges::sort(movies, std::greater{} , &Movie::year); 
+	displayRange(movies);
+	
+
+	auto cmp =  movie1 <=> movie2;
+	bool ok = movie1 <= movie2;
+
+	movies.push_back(Movie("The Man Who Knew Too Much", 1934, 75));
+	movies.push_back(Movie("The Man Who Knew Too Much", 1956, 120));
+	movies.push_back(Movie("Avengers: Doomsday", 2026));
+
+	// NB: std::pair; std::tuple (build with std::tie)
+	std::ranges::sort(movies, {}, [](const auto& movie) {return std::make_pair(-movie.year(), movie.title()); });
+	displayRange(movies);
+	std::ranges::sort(movies, std::greater{}, &Movie::duration);
+	displayRange(movies);
+	std::ranges::sort(movies);
+	displayRange(movies);
 }
 
 void playReferencePointer() {
+	std::println();
+	std::println("*************** Ref vs Pointer *******************");
 	Movie movie("Toy Story 5", 2026);
 	Movie& movie_ref = movie;
 	Movie* movie_ptr = &movie;
@@ -246,10 +358,10 @@ void playReferencePointer() {
 }
 
 int main() {
-	playWithArrays(11);
-	playWithVectorDouble();
-	playWithVectorString();
+	//playWithArrays(11);
+	//playWithVectorDouble();
+	//playWithVectorString();
+	//playReferencePointer();
 	playWithMovies();
-	playReferencePointer();
 	return EXIT_SUCCESS;
 }
