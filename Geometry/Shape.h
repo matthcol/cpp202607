@@ -31,6 +31,6 @@ struct ShapeBaseFormatter {
 	constexpr auto parse(ParseContext& ctx) {
 		auto it = ctx.begin();
 		long_format = (it != ctx.end()) && *it == 'l';
-		return it + long_format;
+		return long_format ? it + 1 : it;
 	}
 };

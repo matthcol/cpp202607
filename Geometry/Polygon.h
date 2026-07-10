@@ -41,6 +41,11 @@ public:
     virtual ~Polygon() = default;
 
     size_type order() const;
+    bool isWellFormed() const { return m_vertices.size() >= 3; }
+    bool isCrossed() const;
+    bool isConvex() const;
+    bool isConcave() const;
+
     const Point& operator[](size_type index) const;
     Point& operator[](size_type index);
 

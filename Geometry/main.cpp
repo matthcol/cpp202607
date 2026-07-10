@@ -142,6 +142,7 @@ void playWithShapes() {
 } // destruction de tous les shapes
 
 void playWithPolygons() {
+	std::println();
 	std::println("*************** P O L Y G O N S **************");
 	Polygon poly0;
 	Polygon poly1(
@@ -209,6 +210,43 @@ void playWithPolygons() {
 	std::println("{::l}", polygons);
 	std::println("{:n:l}", polygons);
 	std::println("{::l:l}", polygons);
+
+	// convex quadrilateral
+	Polygon polySquare(
+		"Square",
+		{
+			Point("A", 0, 0),
+			Point("B", 4, 0),
+			Point("C", 4, 4),
+			Point("D", 0, 4)
+		}
+	);
+
+	// self-intersecting quadrilateral (bowtie)
+	Polygon polyBowtie(
+		"Bowtie",
+		{
+			Point("A", 0, 0),
+			Point("B", 4, 4),
+			Point("C", 4, 0),
+			Point("D", 0, 4)
+		}
+	);
+
+	auto printIndicators = [](const Polygon& p) {
+		std::println(
+			"{}: well_formed={}, crossed={}, convex={}, concave={}",
+			p, p.isWellFormed(), p.isCrossed(), p.isConvex(), p.isConcave()
+		);
+	};
+
+	std::println();
+	std::println("--- indicators ---");
+	printIndicators(poly0);      // degenerate
+	printIndicators(poly2);      // triangle (convex)
+	printIndicators(polyWiki);   // concave (Wikipedia shoelace)
+	printIndicators(polySquare); // convex quadrilateral
+	printIndicators(polyBowtie); // crossed
 }
 
 
