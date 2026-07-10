@@ -80,6 +80,10 @@ void playWithWeightedPoints() {
 	WeightedPoint wp2("W2", 3.5, 5.5, 10.0);
 	std::println("{}, {}", wp1, wp2);
 	std::println("{:l}, {:l}", wp1, wp2);
+
+	std::vector<WeightedPoint> wpoints{ wp1, wp2 };
+	auto bary = WeightedPoint::barycentre(wpoints);
+	std::println("barycentre: {:l}", bary);
 }
 
 void playWithCircles() {

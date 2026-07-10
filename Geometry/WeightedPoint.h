@@ -1,5 +1,6 @@
 #pragma once
 #include "Point.h"
+#include <ranges>
 
 class WeightedPoint: public Point
 {
@@ -14,6 +15,26 @@ public:
 	void setWeight(double weight);
 
 	auto operator<=>(const WeightedPoint& other) const = default;
+
+	template<std::input_iterator I, std::sentinel_for<I> S>
+		requires std::derived_from<std::iter_value_t<I>, WeightedPoint>
+	static WeightedPoint barycentre(I first, S last, const std::string& name = "bary") {
+		double totalWeight = 0.0, wx = 0.0, wy = 0.0;
+		for (auto it = first; it != last; ++it) {
+			totalWeight += it->weight();
+			wx += it->weight() * it->x();
+			wy += it->weight() * it->y();
+		}
+		if (totalWeight == 0.0)
+			return WeightedPoint(name);
+		return WeightedPoint(name, wx / totalWeight, wy / totalWeight, totalWeight);
+	}
+
+	template<std::ranges::input_range R>
+		requires std::derived_from<std::ranges::range_value_t<R>, WeightedPoint>
+	static WeightedPoint barycentre(R&& range, const std::string& name = "bary") {
+		return barycentre(std::ranges::begin(range), std::ranges::end(range), name);
+	}
 };
 
 template <>
