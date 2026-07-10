@@ -12,6 +12,7 @@ private:
 public:
 	// constructor full with default values
 	explicit Point(const std::string& name = std::string(), double x = 0, double y = 0);
+	virtual ~Point() = default;
 
 	// getter + setter
 	double x() const;
@@ -21,8 +22,6 @@ public:
 
 	// implements translate
 	virtual void translate(double deltaX, double deltaY) override; 
-	virtual void translate(const std::pair<double, double>& delta) override;
-	virtual void translate(std::pair<double, double>&& delta) override;
 
 	double distance(const Point& other) const;
 
@@ -31,16 +30,7 @@ public:
 
 // formatter
 template <>
-struct std::formatter<Point> {
-	bool long_format = false;
-
-	template<class ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		auto it = ctx.begin();
-		long_format = (it != ctx.end()) && *it == 'l';
-		return it + long_format; // + 0/1
-	}
-
+struct std::formatter<Point> : ShapeBaseFormatter {
 	template<class FmtContext>
 	auto format(const Point& point, FmtContext& ctx) const {
 		if (long_format) {
@@ -52,6 +42,6 @@ struct std::formatter<Point> {
 	}
 };
 
-static_assert(__cplusplus > 202002L, "compilez en -std=c++23 !");  // pour MSVC, ajouter /Zc:__cplusplus
-static_assert(std::formattable<Point, char>, "formatter<Point> absent ou format() non-const");
+static_assert(__cplusplus > 202002L, "compile with -std=c++23 (MSVC: add /Zc:__cplusplus)");
+static_assert(std::formattable<Point, char>, "formatter<Point> missing or format() not const");
 

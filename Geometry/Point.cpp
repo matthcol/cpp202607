@@ -1,11 +1,17 @@
 #include "Point.h"
 
 #include <cmath>
+//#include <iostream>
 
 Point::Point(const std::string& name, double x, double y):
     Shape(name), m_x(x), m_y(y)
 {
 }
+
+//Point::~Point()
+//{
+//    std::clog << "Point destroyed: " << name() << std::endl;
+//}
 
 double Point::x() const
 {
@@ -31,16 +37,6 @@ void Point::translate(double deltaX, double deltaY)
 {
     m_x += deltaX;
     m_y += deltaY;
-}
-
-void Point::translate(const std::pair<double, double>& delta)
-{
-    translate(delta.first, delta.second);
-}
-
-void Point::translate(std::pair<double, double>&& delta)
-{
-    translate(delta.first, delta.second);
 }
 
 double Point::distance(const Point& other) const
